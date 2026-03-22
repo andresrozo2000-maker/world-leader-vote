@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Worst World Leader</title>
+</head>
+
+<body>
+
+<h1>🌍 Who is the worst world leader in 2026?</h1>
+<p>🗳️ One vote per person • 📊 Live results</p>
+
+<h2>Vote 👇</h2>
+<div id="list"></div>
+
+<h2>Results 📊</h2>
+<ul id="ranking"></ul>
+
+<script>
+const leaders = [
+  { id: "abbas", name: "Mahmoud Abbas", country: "Palestine", flag: "🇵🇸" },
+  { id: "abiy_ahmed", name: "Abiy Ahmed", country: "Ethiopia", flag: "🇪🇹" },
+  { id: "albanese", name: "Anthony Albanese", country: "Australia", flag: "🇦🇺" },
+  { id: "erdogan", name: "Recep Tayyip Erdoğan", country: "Turkey", flag: "🇹🇷" },
+  { id: "bukele", name: "Nayib Bukele", country: "El Salvador", flag: "🇸🇻" },
+  { id: "hasina", name: "Sheikh Hasina", country: "Bangladesh", flag: "🇧🇩" },
+  { id: "anwar_ibrahim", name: "Anwar Ibrahim", country: "Malaysia", flag: "🇲🇾" },
+  { id: "xi", name: "Xi Jinping", country: "China", flag: "🇨🇳" },
+  { id: "kagame", name: "Paul Kagame", country: "Rwanda", flag: "🇷🇼" },
+  { id: "kast", name: "José Antonio Kast", country: "Chile", flag: "🇨🇱" },
+  { id: "kishida", name: "Fumio Kishida", country: "Japan", flag: "🇯🇵" },
+  { id: "lula", name: "Luiz Inácio Lula da Silva", country: "Brazil", flag: "🇧🇷" },
+  { id: "luxon", name: "Christopher Luxon", country: "New Zealand", flag: "🇳🇿" },
+  { id: "macron", name: "Emmanuel Macron", country: "France", flag: "🇫🇷" },
+  { id: "hun_manet", name: "Hun Manet", country: "Cambodia", flag: "🇰🇭" },
+  { id: "mohammed_bin_salman", name: "Mohammed bin Salman", country: "Saudi Arabia", flag: "🇸🇦" },
+  { id: "milei", name: "Javier Milei", country: "Argentina", flag: "🇦🇷" },
+  { id: "mitsotakis", name: "Kyriakos Mitsotakis", country: "Greece", flag: "🇬🇷" },
+  { id: "netanyahu", name: "Benjamin Netanyahu", country: "Israel", flag: "🇮🇱" },
+  { id: "petro", name: "Gustavo Petro", country: "Colombia", flag: "🇨🇴" },
+  { id: "putin", name: "Vladimir Putin", country: "Russia", flag: "🇷🇺" },
+  { id: "raisi", name: "Ebrahim Raisi", country: "Iran", flag: "🇮🇷" },
+  { id: "ramaphosa", name: "Cyril Ramaphosa", country: "South Africa", flag: "🇿🇦" },
+  { id: "rutte", name: "Mark Rutte", country: "Netherlands", flag: "🇳🇱" },
+  { id: "ruto", name: "William Ruto", country: "Kenya", flag: "🇰🇪" },
+  { id: "sanchez", name: "Pedro Sánchez", country: "Spain", flag: "🇪🇸" },
+  { id: "scholz", name: "Olaf Scholz", country: "Germany", flag: "🇩🇪" },
+  { id: "sisi", name: "Abdel Fattah el-Sisi", country: "Egypt", flag: "🇪🇬" },
+  { id: "sheinbaum", name: "Claudia Sheinbaum", country: "Mexico", flag: "🇲🇽" },
+  { id: "starmer", name: "Keir Starmer", country: "United Kingdom", flag: "🇬🇧" },
+  { id: "trump", name: "Donald Trump", country: "United States", flag: "🇺🇸" },
+  { id: "trudeau", name: "Justin Trudeau", country: "Canada", flag: "🇨🇦" },
+  { id: "tusk", name: "Donald Tusk", country: "Poland", flag: "🇵🇱" },
+  { id: "tinubu", name: "Bola Tinubu", country: "Nigeria", flag: "🇳🇬" },
+  { id: "yoon", name: "Yoon Suk Yeol", country: "South Korea", flag: "🇰🇷" },
+  { id: "zelenskyy", name: "Volodymyr Zelenskyy", country: "Ukraine", flag: "🇺🇦" }
+];
+
+// Render lista
+const listDiv = document.getElementById("list");
+
+leaders.forEach(l => {
+  const btn = document.createElement("button");
+  btn.innerText = l.name + " (" + l.country + ") " + l.flag;
+  btn.style.display = "block";
+  btn.style.margin = "5px";
+  btn.onclick = () => vote(l.id);
+  listDiv.appendChild(btn);
+});
+
+// Guardar votos (local por ahora)
+function vote(id) {
+  let votes = JSON.parse(localStorage.getItem("votes") || "{}");
+  votes[id] = (votes[id] || 0) + 1;
+  localStorage.setItem("votes", JSON.stringify(votes));
+  renderResults();
+}
+
+// Mostrar resultados
+function renderResults() {
+  let votes = JSON.parse(localStorage.getItem("votes") || "{}");
+
+  const ranking = Object.entries(votes)
+    .sort((a,b)=>b[1]-a[1]);
+
+  const total = ranking.reduce((sum, r) => sum + r[1], 0);
+
+  document.getElementById("ranking").innerHTML =
+    ranking.map(([id, v]) => {
+      const leader = leaders.find(l => l.id === id);
+      const p = ((v / total) * 100).toFixed(1);
+      return `<li>${leader.name} — ${p}%</li>`;
+    }).join("");
+}
+
+renderResults();
+</script>
+
+</body>
+</html>
