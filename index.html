@@ -16,7 +16,27 @@
 <h2>Results 📊</h2>
 <ul id="ranking"></ul>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+
 <script>
+// 🔥 TU CONFIG (reemplaza con la real)
+const firebaseConfig = {
+  apiKey: "AIzaSyCHU-Ti_dQHD5_JmoSOiN5we7up86kH6wU",
+  authDomain: "world-leader-454dc.firebaseapp.com",
+  databaseURL: "https://world-leader-454dc-default-rtdb.firebaseio.com",
+  projectId: "world-leader-454dc",
+  storageBucket: "world-leader-454dc.firebasestorage.app",
+  messagingSenderId: "140150536078",
+  appId: "1:140150536078:web:08e1b918fff7f12afa96df",
+  measurementId: "G-BD0RKCVHW9"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Lista de líderes
 const leaders = [
   { id: "abbas", name: "Mahmoud Abbas", country: "Palestine", flag: "🇵🇸" },
   { id: "abiy_ahmed", name: "Abiy Ahmed", country: "Ethiopia", flag: "🇪🇹" },
@@ -61,39 +81,35 @@ const listDiv = document.getElementById("list");
 
 leaders.forEach(l => {
   const btn = document.createElement("button");
-  btn.innerText = l.name + " (" + l.country + ") " + l.flag;
+  btn.innerText = `${l.name} (${l.country}) ${l.flag}`;
   btn.style.display = "block";
   btn.style.margin = "5px";
   btn.onclick = () => vote(l.id);
   listDiv.appendChild(btn);
 });
 
-// Guardar votos (local por ahora)
+// Votar (Firebase)
 function vote(id) {
-  let votes = JSON.parse(localStorage.getItem("votes") || "{}");
-  votes[id] = (votes[id] || 0) + 1;
-  localStorage.setItem("votes", JSON.stringify(votes));
-  renderResults();
+  const ref = db.ref("votes/" + id);
+  ref.transaction(current => (current || 0) + 1);
 }
 
-// Mostrar resultados
-function renderResults() {
-  let votes = JSON.parse(localStorage.getItem("votes") || "{}");
+// Resultados en tiempo real
+db.ref("votes").on("value", snapshot => {
+  const data = snapshot.val() || {};
 
-  const ranking = Object.entries(votes)
+  const ranking = Object.entries(data)
     .sort((a,b)=>b[1]-a[1]);
 
-  const total = ranking.reduce((sum, r) => sum + r[1], 0);
+  const total = Object.values(data).reduce((a,b)=>a+b,0);
 
   document.getElementById("ranking").innerHTML =
     ranking.map(([id, v]) => {
       const leader = leaders.find(l => l.id === id);
-      const p = ((v / total) * 100).toFixed(1);
+      const p = total ? ((v / total) * 100).toFixed(1) : 0;
       return `<li>${leader.name} — ${p}%</li>`;
     }).join("");
-}
-
-renderResults();
+});
 </script>
 
 </body>
