@@ -90,8 +90,21 @@ leaders.forEach(l => {
 
 // Votar (Firebase)
 function vote(id) {
+  const alreadyVoted = localStorage.getItem("voted");
+
+  if (alreadyVoted) {
+    alert("You already voted!");
+    return;
+  }
+
   const ref = db.ref("votes/" + id);
   ref.transaction(current => (current || 0) + 1);
+
+  localStorage.setItem("voted", "true");
+
+  document.querySelectorAll("button").forEach(b => b.disabled = true);
+
+  alert("Vote submitted!");
 }
 
 // Resultados en tiempo real
