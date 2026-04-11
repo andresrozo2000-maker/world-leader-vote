@@ -165,9 +165,8 @@ function vote(id) {
 
   alert("Vote submitted!");
 }
-
 // Resultados en tiempo real
-return `<li>${leader.name} — ${p}%</li>`;
+db.ref("votes").on("value", snapshot => {
   const data = snapshot.val() || {};
 
   const ranking = Object.entries(data)
@@ -179,7 +178,7 @@ return `<li>${leader.name} — ${p}%</li>`;
     ranking.map(([id, v]) => {
       const leader = leaders.find(l => l.id === id);
       const p = total ? ((v / total) * 100).toFixed(1) : 0;
-      return `<li>${leader.name} — ${p}%</li>`;
+      return `<li><strong>${leader.name}</strong> — ${p}% (${v} votes)</li>`;
     }).join("");
 });
 </script>
